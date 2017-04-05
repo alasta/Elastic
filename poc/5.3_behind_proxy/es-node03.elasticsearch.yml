@@ -1,4 +1,4 @@
-#ElasticSearch config : $RACINE_ES/config/elasticsearch.yml
+#ElasticSearch config : $RACINE_ES_NODE03/config/elasticsearch.yml
 cluster.name: es-cluster-poc
 node.name: es-node03
 http.port: 9202
