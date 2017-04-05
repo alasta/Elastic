@@ -1,0 +1,5 @@
+
+#Kibana config : $RACINE_KIBANA/config/kibana.yml
+server.basePath: "/kibana"
+server.name: "pocES5.3proxy"
+elasticsearch.url: "http://127.0.0.1:80/clusteres/"
