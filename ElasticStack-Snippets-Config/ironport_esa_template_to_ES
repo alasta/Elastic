@@ -1,0 +1,136 @@
+{
+    "template" : "logstash-syslogrelais-irp-*",
+    "settings" : {
+      "index" : {
+        "refresh_interval" : "10s"
+      }
+    },
+    "mappings" : {
+      "_default_" : {
+        "dynamic_templates" : [ {
+          "message_field" : {
+            "mapping" : {
+              "index" : "analyzed",
+              "omit_norms" : true,
+              "fielddata" : {
+                "format" : "disabled"
+              },
+              "type" : "string"
+            },
+            "match_mapping_type" : "string",
+            "match" : "message"
+          }
+        }, {
+          "string_fields" : {
+            "mapping" : {
+              "index" : "analyzed",
+              "omit_norms" : true,
+              "fielddata" : {
+                "format" : "disabled"
+              },
+              "type" : "string",
+              "fields" : {
+                "raw" : {
+                  "index" : "not_analyzed",
+                  "ignore_above" : 256,
+                  "doc_values" : true,
+                  "type" : "string"
+                }
+              }
+            },
+            "match_mapping_type" : "string",
+            "match" : "*"
+          }
+        }, {
+          "float_fields" : {
+            "mapping" : {
+              "doc_values" : true,
+              "type" : "float"
+            },
+            "match_mapping_type" : "float",
+            "match" : "*"
+          }
+        }, {
+          "double_fields" : {
+            "mapping" : {
+              "doc_values" : true,
+              "type" : "double"
+            },
+            "match_mapping_type" : "double",
+            "match" : "*"
+          }
+        }, {
+          "byte_fields" : {
+            "mapping" : {
+              "doc_values" : true,
+              "type" : "byte"
+            },
+            "match_mapping_type" : "byte",
+            "match" : "*"
+          }
+        }, {
+          "short_fields" : {
+            "mapping" : {
+              "doc_values" : true,
+              "type" : "short"
+            },
+            "match_mapping_type" : "short",
+            "match" : "*"
+          }
+        }, {
+          "integer_fields" : {
+            "mapping" : {
+              "doc_values" : true,
+              "type" : "integer"
+            },
+            "match_mapping_type" : "integer",
+            "match" : "*"
+          }
+        }, {
+          "long_fields" : {
+            "mapping" : {
+              "doc_values" : true,
+              "type" : "long"
+            },
+            "match_mapping_type" : "long",
+            "match" : "*"
+          }
+        }, {
+          "date_fields" : {
+            "mapping" : {
+              "doc_values" : true,
+              "type" : "date"
+            },
+            "match_mapping_type" : "date",
+            "match" : "*"
+          }
+        }, {
+          "geo_point_fields" : {
+            "mapping" : {
+              "doc_values" : true,
+              "type" : "geo_point"
+            },
+            "match_mapping_type" : "geo_point",
+            "match" : "*"
+          }
+        } ],
+        "properties" : {
+          "@timestamp" : {
+            "doc_values" : true,
+            "type" : "date"
+          },
+          "@version" : {
+            "index" : "not_analyzed",
+            "doc_values" : true,
+            "type" : "string"
+          }
+        },
+        "_all" : {
+          "enabled" : true,
+          "omit_norms" : true
+        }
+      }
+    },
+    "aliases" : { }
+  }
+}
