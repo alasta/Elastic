@@ -1,0 +1,8 @@
+#ElasticSearch config : $RACINE_ES/config/elasticsearch.yml
+cluster.name: es-cluster-poc
+node.name: es-node03
+http.port: 9202
+discovery.zen.ping.unicast.hosts: ["127.0.0.1", "127.0.0.1:9301", "127.0.0.1:9302"]
+discovery.zen.minimum_master_nodes: 2
+transport.tcp.port: 9302
+path.repo: "/tmp/backupES"
