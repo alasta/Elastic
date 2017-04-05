@@ -1,7 +1,7 @@
 #!/bin/sh
 #################################################
 # date creation : 2016-06-08
-# last modification :
+# last modification : 2017-04-05 - modify jvm URL to ES v5
 # description : ES stats for Cacti 
 # creation : Alasta
 #################################################
@@ -92,7 +92,10 @@ case $C_COMMAND in
 )
   ;;
 	jvmheapuse)
-		URL='/_cat/nodes?h=host,heap.percent'
+		#ES v2
+		#URL='/_cat/nodes?h=host,heap.percent'
+		#ES v5
+		URL='/_cat/nodes?h=ip,heap.percent'
 		RESULT=$(curl_function ${URL} | ${BIN_AWK} '$1~/'${ELASTIC_HOST}'/ {print "heapusepercent:"$2}')
 		
 	;;
