@@ -1,0 +1,30 @@
+input {
+  #Forward from syslog filter
+  tcp {
+    #logs fortinet
+    port => 5546
+    type => "syslog-fortinet"
+  }
+}
+
+filter {
+  if [type] == "syslog-fortinet" {
+    kv {
+      add_tag => [ "fortinet" ]
+      #Attention le champ type est ecrase car il existe dans le log
+      remove_field => [ "message" ]
+    }
+  }
+}
+
+output {
+  if "fortinet" in [tags] {
+    elasticsearch {
+      index => "logstash-fortinet-%{+YYYY.MM.dd}"
+    }
+  } else {
+    elasticsearch {
+      hosts => "localhost"
+    }
+  }
+}

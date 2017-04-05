@@ -1,0 +1,10 @@
+#begin Postfix
+grok {
+  break_on_match => true
+  patterns_dir => ["/etc/logstash/patterns"]
+  match => [ "message", "%{POSTFIXID}:\suid=%{INT:uidd}\sfrom=\<%{POSTFIXEMAIL:from_uid}\>" ]
+  match => [ "message", "%{POSTFIXID}:\smessage-id=\<%{POSTFIXEMAIL:message_id}\>" ]
+  match => [ "message", "%{POSTFIXID}:\sfrom=\<%{POSTFIXEMAIL:from_email}\>,\ssize=%{INT:size},\snrcpt=%{INT:nrcpt}\s\(%{GREEDYDATA:info_etat}\)" ]
+  match => [ "message", "%{POSTFIXID}:\sto=\<%{POSTFIXEMAIL:to_email}\>,\srelay=%{HOSTNAME:smtp_hostname}\[%{IP:smtp_ip}\]:%{INT:smtp_port},\sdelay=%{NUMBER:delay_global},\sdelays=%{GREEDYDATA:delay_details},\sdsn=%{POSTFIXDSN:dsn},\sstatus=%{WORD:status}\s\(%{GREEDYDATA:info_smtp}\)" ]
+  add_tag => [ "mail", "postfix" ]
+}

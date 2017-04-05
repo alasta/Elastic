@@ -1,0 +1,8 @@
+## NGINX accesslogs
+match => { "message" => "_%{DATA:virtualhost}:\s%{COMBINEDAPACHELOG}" }
+add_tag => [ "nginx", "accesslogs" ]
+
+## NGINX errorlogs
+patterns_dir => ["/etc/logstash/patterns"]
+match => { "message" => "_%{DATA:virtualhost}:\s%{MYHTTPDATE:timestamp}%{GREEDYDATA}%{INT}\s%{GREEDYDATA:action},\sclient:\s%{IP:clientip},\sserver:\s%{GREEDYDATA:servername},\srequest:\s\"%{WORD:verb}\s%{GREEDYDATA:resquest}\sHTTP/%{NUMBER:httpversion}\",\shost:\s\"%{NOTSPACE:host}\"(,\sreferrer:\s\"%{GREEDYDATA:referrer}\")?" }
+add_tag => [ "nginx", "errorslogs" ]

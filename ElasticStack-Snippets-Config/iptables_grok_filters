@@ -1,0 +1,3 @@
+patterns_dir => ["/etc/logstash/patterns"]
+match => { "message" => "%{MYIPTABLES}"}
+add_tag => [ "iptables", "iptables-drop"]

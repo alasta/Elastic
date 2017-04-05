@@ -1,0 +1,17 @@
+# grok pattern 
+# Add to filter
+
+#log 1
+<14>Jan 20 08:40:25 dns-pub01 named[17493]: client 193.168.50.254#11300: query: _adsp._domainkey.doc.fr IN TXT -ED (192.168.1.1)
+#logstash
+%{SYSLOGTIMESTAMP:timestamp} %{HOSTNAME:server}\s%{WORD:process}\[%{INT:pid}\]%{GREEDYDATA}%{IP:client_ip}#%{INT:source_port}:\s%{DATA:dns_opcode}:\s%{GREEDYDATA:dns_qname}\s%{WORD:dns_qclass}\s%{WORD:dns_qtype}\s%{GREEDYDATA:dns_flag}\s\S%{IP:dns_ip_listener}
+
+#log2
+<11>Jan 20 09:08:15 dns-pub01 named[14371]: client 185.26.230.6#45184: zone transfer 'down.com/AXFR/IN' denied
+#logstash
+%{SYSLOGTIMESTAMP:timestamp} %{HOSTNAME:server}\s%{WORD:process}\[%{INT:pid}\]%{GREEDYDATA}%{IP:client_ip}#%{INT:source_port}:\s%{GREEDYDATA:dns_opcode}\s\'%{GREEDYDATA:dns_qname}/%{WORD:dns_qtype}/%{WORD:dns_qclass}'\s%{WORD:status}
+
+#log3
+<30>Jan 20 09:18:10 dns-pub01 named[14371]: client 185.26.230.6#49694: bad zone transfer request: 'effect.org/IN': non-authoritative zone (NOTAUTH)
+#logstash
+%{SYSLOGTIMESTAMP:timestamp} %{HOSTNAME:server}\s%{WORD:process}\[%{INT:pid}\]%{GREEDYDATA}%{IP:client_ip}#%{INT:source_port}:\s%{GREEDYDATA:dns_opcode}:\s\'%{GREEDYDATA:dns_qname}/%{WORD:dns_qclass}':\s%{GREEDYDATA:status}

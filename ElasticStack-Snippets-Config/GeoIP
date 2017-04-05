@@ -1,0 +1,16 @@
+## Logstash 2.X 
+   
+#Get "GeoLite City" to http://dev.maxmind.com/geoip/legacy/geolite/
+#GeoIP - remote_ip contains IP to analize
+geoip {
+  source => "remote_ip"
+  database => "/etc/logstash/GeoLiteCity.dat"
+}
+
+## Logstash 5.X
+
+#Get "GeoLite2 City" to http://dev.maxmind.com/geoip/geoip2/geolite2/
+geoip {
+   source => "remote_ip"
+   database => "/etc/logstash/GeoLite2-City.mmdb"
+}

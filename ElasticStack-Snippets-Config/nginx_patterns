@@ -1,0 +1,3 @@
+#Pour certaines errorlogs nginx
+#To some nginx errorlogs
+MYHTTPDATE %{YEAR}/%{MONTHNUM}/%{MONTHDAY}[T ]%{HOUR}:?%{MINUTE}(?::?%{SECOND})?%{ISO8601_TIMEZONE}?

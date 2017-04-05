@@ -1,0 +1,4 @@
+#Postfix
+POSTFIXID [a-fA-F0-9]{11}
+POSTFIXEMAIL (%{DATA}@%{DATA}|%{WORD})
+POSTFIXDSN %{INT}.%{INT}.%{INT}

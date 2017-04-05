@@ -1,0 +1,54 @@
+input {
+  #Forward from syslog filter
+   tcp {
+    #logs F5 APM
+    port => 5548
+    type => "syslog-f5apm"
+  }
+}
+
+filter {
+if [type] == "syslog-f5apm" {
+    grok {
+      patterns_dir => ["/etc/logstash/patterns"]
+      break_on_match => true
+	  
+      ##F5 regex (mainly APM module) to grok filter in logstash configuration
+      match => { "message" => "%{F5BEGINPATTERN}Session\svariable\s\'%{F5VARSESSIONNAME:f5_var_session_name}\'\sset\sto\s\'%{F5VARSESSIONVAL:f5_var_session_value}\'" }
+      match => { "message" => "%{F5BEGINPATTERN}Session\sstatistics\s-\sbytes\sin:\s%{INT:bytesIn},\sbytes\sout:\s%{INT:bytesOut}" }
+      match => { "message" => "%{F5BEGINPATTERN}Session_id=%{F5SESSIONID:session_id},\stime_session_started=(%{F5_DATESTAMP:time_session_started}|),\stime_session_ended=%{F5_DATESTAMP:time_session_ended},\suser_name=(%{USERNAME:username}|),\sclient_ip=(%{IPORHOST:client_ip}|),assigned_ip=(%{IPORHOST:assigned_ip}|),\svpn_run_time=%{DATA:vpn_run_time},\svpn_end_reason=%{DATA:vpn_end_reason},\sSSL=\"(%{DATA:ssl_proto}|)\",\sSSLcipher=\"(%{DATA:ssl_cipher}|)\"" }
+      match => { "message" => "%{F5BEGINPATTERN}Executed\sagent\s\'%{F5VARSESSIONNAME:f5_exec_agent_name}\',\sreturn\svalue\s%{F5VARSESSIONVAL:f5_exec_agent_value}" }
+      match => { "message" => "%{F5BEGINPATTERN}Following\srule\s\'%{GREEDYDATA:f5_following_rule}\'\sfrom\sitem\s\'%{GREEDYDATA:f5_from_item}\'\sto\s(item|terminalout|ending)\s\'%{GREEDYDATA:f5_to_item}\'" }
+      match => { "message" => "%{F5BEGINPATTERN}New\ssession\sfrom\sclient\sIP\s%{IPORHOST:client_ip}\s\(ST=%{NOTSPACE:f5_loc_state}\/CC=%{NOTSPACE:f5_loc_country}\/C=%{NOTSPACE:f5_loc_continent}\)\sat\sVIP\s%{IPORHOST:f5_vip}\sListener\s%{NOTSPACE:f5_listener}\s\(Reputation=%{DATA:f5_reputation}\)" }
+      match => { "message" => "%{F5BEGINPATTERN}Received\sUser-Agent\sheader:\s%{GREEDYDATA:f5_useragent}." }
+      match => { "message" => "%{F5BEGINPATTERN}Received\sclient\sinfo\s-\sType:\s%{NOTSPACE:f5_client_type}\sVersion:\s%{INT:f5_client_version}\sPlatform:\s%{NOTSPACE:f5_client_platform}\sCPU:\s%{NOTSPACE:f5_client_cpu}\sUI\sMode:\s%{DATA:f5_client_uimode}\sSupport:\s%{INT:f5_client_supportuimode}\sActiveX\sSupport:\s%{INT:f5_client_supportactivex}\sPlugin\sSupport:\s%{INT:f5_client_supportplugin}" }
+      match => { "message" => "%{F5BEGINPATTERN}Session\sdeleted\sdue\sto\s%{GREEDYDATA:f5_session_deleted_to}." }
+      match => { "message" => "%{F5BEGINPATTERN}PPP\stunnel\s%{F5HEX:f5_ppp_id}\s%{GREEDYDATA:f5_ppp_action}." }
+      match => { "message" => "%{F5BEGINPATTERN}Assigned\sPPP\sDynamic\sIPv4:\s%{IPORHOST:assigned_ip}\sTunnel\sType:\s%{GREEDYDATA:f5_tunneltype}\sNA\sResource:\s%{GREEDYDATA:f5_netaccess}\sClient\sIP:\s%{GREEDYDATA:client_ip}\s" }
+      match => { "message" => "%{F5BEGINPATTERN}Connectivity\sresource\s\'%{GREEDYDATA:f5_connectivity_resource}\'\sassigned" }
+      match => { "message" => "%{F5BEGINPATTERN}Access\spolicy\sresult:\s%{GREEDYDATA:f5_access_policy_relust}"  }
+      match => { "message" => "%{F5BEGINPATTERN}Webtop\s\'%{GREEDYDATA:f5_webtop_assigned}\'\sassigned" }
+      match => { "message" => "%{F5BEGINPATTERN}LDAP\sagent:\s%{NOTSPACE:f5_ldap_type}\s\(logon\sattempt:%{INT:f5_ldap_attempt}\):\sauthenticate\swith\s\'%{USERNAME:username}\'\s%{GREEDYDATA:f5_ldap_auth_result}" }
+      match => { "message" => "%{F5BEGINPATTERN}LDAP\sagent:\s%{NOTSPACE:f5_ldap_type}:\s%{DATA:f5_ldap_auth_result},\s%{GREEDYDATA:f5_ldap_query}" }
+      match => { "message" => "%{F5BEGINPATTERN}Username\s\'%{USERNAME:username}\'" }
+      match => { "message" => "%{F5BEGINPATTERN}LDAP\sModule:\sCannot\sfind\sany\sobject\sin\ssearch\sDN\s%{GREEDYDATA:f5_message}" }
+	  
+      #Custom messages from iRule/VPE:
+      match => { "message" => "%{F5BEGINPATTERN}LDAP\sagent:\s%{GREEDYDATA:personalized_user_message}" }
+      add_tag => [ "f5apm" ]
+      #remove_field => [ "message" ]
+    }
+}
+
+
+output {
+  if [type] == "syslog-f5apm" {
+    elasticsearch {
+      index => "logstash-f5apm-%{+YYYY.MM.dd}"
+    }
+  } else {
+    elasticsearch {
+      hosts => "localhost"
+    }
+  }
+}
