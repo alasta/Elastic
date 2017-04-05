@@ -40,7 +40,7 @@ Nginx in reverse proxy to :
 
 
 ### Version :
-CentOS 7
+CentOS 7 (4 cores & 8Go RAM)
 Nginx : 1.10.3  
 ElasticSearch : 5.3  
 Kibana : 5.3  
