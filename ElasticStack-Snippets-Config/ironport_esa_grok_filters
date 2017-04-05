@@ -1,0 +1,68 @@
+input {
+  #Forward from syslog filter
+   tcp {
+    #logs CISCO IronPort ESA
+    port => 5549
+    type => "syslog-irp-esa"
+  }
+}
+
+filter {
+if [type] == "syslog-irp-esa" {
+    grok {
+      break_on_match => true
+      #Possible optimize ...
+       match => { "message" => "%{IP:device}\s%{DATA:log_subscriptions}:(?:.*)\sMID\s%{INT:mid}\santivirus\spositive\s%{GREEDYDATA:virus_detail}" }
+       match => { "message" => "%{IP:device}\s%{DATA:log_subscriptions}:(?:.*)\sMID\s%{INT:mid}\susing\sengine:\sCASE\sspam\s%{GREEDYDATA:spam_etat}" }
+       match => { "message" => "%{IP:device}\s%{DATA:log_subscriptions}:(?:.*)\sMID\s%{INT:mid}\sinterim\sAV\sverdict\susing\sSophos\s%{WORD:virus_etat}" }
+       match => { "message" => "%{IP:device}\s%{DATA:log_subscriptions}:(?:.*)\sMID\s%{INT:mid}\sOutbreak\sFilters:\sverdict\s%{GREEDYDATA:vof_etat}" }
+       match => { "message" => "%{IP:device}\s%{DATA:log_subscriptions}:(?:.*)\sInfo:\sMID\s%{INT:mid}\smatched\sall\srecipients\sfor\sper-recipient\spolicy\s%{WORD:policy}\sin\sthe\s%{WORD:table}" }
+       match => { "message" => "%{IP:device}\s%{DATA:log_subscriptions}:(?:.*)\sInfo:\s%{DATA:desc}:\sMID\s%{INT:mid}\sto\s%{INT:rid}\s-\s%{DATA:ndr}\s-\s%{GREEDYDATA:details}" }
+       match => { "message" => "%{IP:device}\s%{DATA:log_subscriptions}:(?:.*)\sInfo:\s%{GREEDYDATA:error_info}:\sDCID\s%{INT:dcid}\sdomain:\s%{GREEDYDATA:domain}\sIP:\s%{IP:mta_ip}\sport:\s%{INT:smtp_port}\sdetails:\s%{GREEDYDATA:error}\sinterface:\s%{IP:ip_interface}\sreason:\s%{GREEDYDATA:reason}" }
+       match => { "message" => "%{IP:device}\s%{DATA:log_subscriptions}:(?:.*)\sInfo:\sMID\s%{INT:mid}\sCustom\sLog\sEntry:\s(%{GREEDYDATA:custom_log}:\s%{GREEDYDATA:header_from}|%{GREEDYDATA:custom_log})" }
+       match => { "message" => "%{IP:device}\s%{DATA:log_subscriptions}:(?:.*)\sInfo:\sICID\s%{INT:icid}\s%{WORD:action}\sSG\s%{WORD:sender_group}\smatch\s(%{IP:sender}|.*)\sSBRS\s(%{NUMBER:sbrs}|)" }
+       match => { "message" => "%{IP:device}\s%{DATA:log_subscriptions}:(?:.*)\sNew\sSMTP\sDCID\s%{INT:dcid}\sinterface\s%{IP:ip_interface}\saddress\s%{IP:ip_address}\sport\s%{INT:smtp_port}" }
+       match => { "message" => "%{IP:device}\s%{DATA:log_subscriptions}:(?:.*)\sInfo:\sMID\s%{INT:mid}\sRID\s\[%{DATA:rid}\]\sResponse\s\'%{GREEDYDATA:response}\'" }
+       match => { "message" => "%{IP:device}\s%{DATA:log_subscriptions}:(?:.*)\sInfo:\sMID\s%{INT:mid}\sSubject\s\'%{GREEDYDATA:subject}\'" }
+       match => { "message" => "%{IP:device}\s%{DATA:log_subscriptions}:(?:.*)\sInfo:\sMID\s%{INT:mid}\sMessage-ID\s\'\<%{GREEDYDATA:mta}\>\'" }
+       match => { "message" => "%{IP:device}\s%{DATA:log_subscriptions}:(?:.*)\sInfo:\sICID\s%{INT:icid}\s%{GREEDYDATA:desc}" }
+       match => { "message" => "%{IP:device}\s%{DATA:log_subscriptions}:(?:.*)\sInfo:\sMID\s%{INT:mid}\sICID\s%{INT:icid}\sRID\s%{DATA:rid}\sTo:\s\<%{GREEDYDATA:mail_to}\>" }
+       match => { "message" => "%{IP:device}\s%{DATA:log_subscriptions}:(?:.*)\sInfo:\sMID\s%{INT:mid}\sICID\s%{INT:icid}\sFrom:\s\<%{GREEDYDATA:mail_from}\>" }
+       match => { "message" => "%{IP:device}\s%{DATA:log_subscriptions}:(?:.*)\sInfo:\s%{DATA:desc}\sDCID\s%{INT:dcid}\sMID\s%{INT:mid}\sto\sRID\s\[%{GREEDYDATA:rid}\]" }
+       match => { "message" => "%{IP:device}\s%{DATA:log_subscriptions}:(?:.*)\sInfo:\s%{DATA:desc}\sMID\s%{INT:mid}\sICID\s%{INT:icid}" }
+       match => { "message" => "%{IP:device}\s%{DATA:log_subscriptions}:(?:.*)\sInfo:\s%{DATA:desc}:\sDCID\s%{INT:dcid}\sMID\s%{INT:mid}\sto\sRID\s%{DATA:rid}\s-\s%{GREEDYDATA:info}" }
+       match => { "message" => "%{IP:device}\s%{DATA:log_subscriptions}:(?:.*)\sInfo:\sDCID\s%{INT:dcid}\s%{GREEDYDATA:desc}" }
+       match => { "message" => "%{IP:device}\s%{DATA:log_subscriptions}:(?:.*)\sInfo:\s%{GREEDYDATA:desc}\sMID\s%{INT:mid}" }
+       match => { "message" => "%{IP:device}\s%{DATA:log_subscriptions}:(?:.*)\sInfo:\sMID\s%{INT:mid}\sready\s%{INT:size_bytes}\sbytes\sfrom\s\<%{GREEDYDATA:mail_from}\>" }
+       match => { "message" => "%{IP:device}\s%{DATA:log_subscriptions}:(?:.*)\sInfo:\sMID\s%{INT:mid}\s%{GREEDYDATA:desc}" }
+       match => { "message" => "%{IP:device}\s%{DATA:log_subscriptions}:(?:.*)\sNew\sSMTP\sICID\s%{INT:icid}\sinterface\s%{GREEDYDATA:name_interface}\s\(%{IP:ip_interface}\)\saddress\s%{IP:ip_address}\s%{GREEDYDATA:desc}" }
+       match => { "message" => "%{IP:device}\s%{DATA:log_subscriptions}:(?:.*)\sInfo:\sMID\s%{INT:mid}\s%{GREEDYDATA:desc}" }
+       match => { "message" => "%{IP:device}\s(?:.*)\sInfo:\s%{DATA:desc}:\sMID\s%{INT:mid}\sto\s%{INT:rid}\s-\s%{DATA:ndr}\s-\s%{GREEDYDATA:details}" }
+       match => { "message" => "%{IP:device}\s%{DATA:log_subscriptions}:(?:.*):\s%{GREEDYDATA:etat}\s%{HOSTNAME:recipient_host}(,|\swith)\s+%{INT:msg}\smsgs\s%{GREEDYDATA:desc}" }
+       match => { "message" => "%{IP:device}\s%{DATA:log_subscriptions}:(?:.*)\s%{DATA:desc}:\srcode=%{WORD:rcode}\sdata=%{GREEDYDATA:data}\sto\sIP\s%{IP:dns_ip}\slooking\sup\s%{GREEDYDATA:domain_lookup}" }
+       match => { "message" => "%{IP:device}\s%{DATA:log_subscriptions}:(?:.*):\s(?<desc>System limit reached: connection limit)\sfor\sIP\s%{IP:mta_ip}\son\slistener\s%{WORD:listener_name}\sICID\s%{INT:icid}:\smax:\s%{INT:max_number}" }
+       match => { "message" => "%{IP:device}\s%{DATA:log_subscriptions}:(?:.*)\sMID\s%{INT:mid},\s(?<desc>Message Scanning Problem):\s%{GREEDYDATA:reason}" }
+       match => { "message" => "%{IP:device}\s(?:.*)\s(?<error>DNS Error|DNS Temporary Failure)\s%{DATA:domain_lookup}\s%{WORD:dns_qtype}\s-\s%{GREEDYDATA:dns_response}" }
+       match => { "message" => "%{IP:device}\s(?:.*)Mail\sdelivery\sclient\swith\sDCID\s%{INT:dcid}\s%{GREEDYDATA:desc}" }
+       match => { "message" => "%{IP:device}\s(?:.*):\s%{GREEDYDATA:desc}\s\(ex. loopback or zero\).\sdomain=%{HOSTNAME:domain_lookup}" }
+       match => { "message" => "%{IP:device}\s(?:.*):\s(?<error>Internal SMTP)\s%{GREEDYDATA:details}" }
+       add_tag => [ "ironport" ]
+    }
+    #Get domain in mail_to and mail_from
+    grok {
+      break_on_match => true
+      match => { "mail_to" => "@%{GREEDYDATA:domain}" }
+      match => { "mail_from" => "@%{GREEDYDATA:domain}" }
+    }
+}
+output {
+  if [type] == "syslog-irp-esa" {
+    elasticsearch {
+      index => "logstash-irp-esa-%{+YYYY.MM.dd}"
+    }
+  } else {
+    elasticsearch {
+      hosts => "localhost"
+    }
+  }
+}
