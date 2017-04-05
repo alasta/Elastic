@@ -15,6 +15,7 @@ Nginx in reverse proxy to :
     - create a folder "poces"
     - go to this folder
     - SELinux in permissive to he POC
+    - Modify FW rules or disable it
   - ElasticSearch
     - download ElasticSearch archive
     - extract archive
